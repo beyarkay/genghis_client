@@ -22,6 +22,7 @@ else:
 
 while True:
     # Check that the username isn't already taken
+    if DEBUG: print(server_url + "/check_username.php")
     r = requests.post(
         server_url + "/check_username.php",
         json={'username': username}
@@ -47,6 +48,7 @@ json = {
 }
 if DEBUG: print("POST to {} with '{}'".format(server_url + "/register_client.php", json))
 r = requests.post(server_url + "/register_client.php", json=json)
+if DEBUG: print(r.text)
 return_data = r.json()
 if not return_data['status'] == 'good':
     # Update the config.json file
