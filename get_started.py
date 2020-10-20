@@ -11,13 +11,19 @@ while True:
     username = input("Your username: ")
     # Check that the username isn't already taken
     username_taken = False
+    r = requests.post(
+        server_url + "/check_username.php",
+        json={'username': username}
+    )
+    print(r.status_code)
+    print(r.json)
     if not username_taken:
         break
     print("That username has already been taken, please choose another.")
 
 print("The server will use these letters: \n{} \nas "
       "a 1-letter abbreviation in order to represent you."
-      .format(', '.join([str(c).lower() for c in username if c.isalpha()])))
+      .format([str(c).lower() for c in username if c.isalpha()][0]))
 # Register the client with the server.
 r = requests.post(server_url, json={})
 if r.ok:
@@ -27,7 +33,6 @@ else:
 # Update the config.json file
 
 # Provide feedback that the registration was successful
-
 
 
 d = os.path.dirname(os.path.abspath(__file__))
