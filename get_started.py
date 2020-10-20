@@ -30,14 +30,14 @@ while True:
         break
     print("That username has already been taken, please choose another.")
     username = input("Your username: ")
-
+abbreviations = [str(c).lower() for c in username if c.isalpha()][0:1]
 print("The server will use these letters: \n{} \nas "
       "a 1-letter abbreviation in order to represent you."
-      .format([str(c).lower() for c in username if c.isalpha()][0]))
+      .format( abbreviations))
 # Register the client with the server.
-json =
+json = {"username":username, "abbreviations": abbreviations}
 print("POST to {} with '{}'".format(server_url, json))
-r = requests.post(server_url, json={})
+r = requests.post(server_url, json=json)
 if r.ok:
     print('Done\nGo to {} to see the current battle'.format(server_url))
 else:
