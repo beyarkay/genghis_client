@@ -23,12 +23,12 @@ else:
 while True:
     abbreviations = [str(c).lower() for c in username if c.isalpha()][0:1]
     # Register the client with the server.
-    json = {
+    new_client = {
         "username": username,
         "abbreviations": abbreviations,
         "url": client_url,
     }
-    r = requests.post(server_url + "/register_client.php", json=json)
+    r = requests.post(server_url + "/register_client.php", json=new_client )
     if DEBUG: print(r.text)
     return_data = r.json()
     if return_data['status'] == 'good':
@@ -45,9 +45,11 @@ while True:
         if DEBUG: print("Config file updated: " + str(config))
 
         print("All Complete.\nGo to {} to see the server".format(server_url))
+        break
     elif return_data['cause'] == 'username':
         print("That username has already been taken, please choose another.")
         username = input("Choose a username: ")
         continue
     else:
         print("Error occured during client registration: {}".format(return_data))
+        break
