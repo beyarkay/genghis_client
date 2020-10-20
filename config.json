@@ -1,6 +1,14 @@
 {
   "bots": [
-    {"path": "template_bot.py"}
+    {
+      "path": "template_bot.py",
+      "name": "my bot"
+    }
   ],
-  "battleground_path": "template_battleground.txt",
+  "battlegrounds": [
+    {
+      "path": "template_battleground.txt",
+      "name": "my battleground"
+    }
+  ]
 }
