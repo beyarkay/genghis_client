@@ -3,8 +3,4 @@
     {"path": "template_bot.py"}
   ],
   "battleground_path": "template_battleground.txt",
-  "username": "boyd",
-  "abbreviations": ["b", "k"],
-  "url": "https://people.cs.uct.ac.za/~KNXBOY001/genghis_client/",
-  "server_url": "https://people.cs.uct.ac.za/~KNXBOY001/genghis_server/"
 }
