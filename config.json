@@ -1,14 +1,14 @@
 {
   "bots": [
     {
-      "path": "template_bot.py"
+      "path": "template_bot.py",
+      "name": "my bot"
     }
   ],
-  "battleground_path": "template_battleground.txt",
-  "username": "boyd",
-  "abbreviations": [
-    "b"
-  ],
-  "url": "https://people.cs.uct.ac.za/~KNXBOY001/genghis_client",
-  "server_url": "https://people.cs.uct.ac.za/~KNXBOY001/genghis_server"
+  "battlegrounds": [
+    {
+      "path": "template_battleground.txt",
+      "name": "my battleground"
+    }
+  ]
 }
