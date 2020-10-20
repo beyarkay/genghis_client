@@ -1,0 +1,6 @@
+{
+  "bots": [
+    {"path": "./bot.py"}
+  ],
+  "battleground_path": "./template_battleground.txt"
+}
