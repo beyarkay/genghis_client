@@ -44,6 +44,14 @@ while True:
         
         if DEBUG: print("Config file updated: " + str(config))
 
+        # Now make sure all the bot/battleground files have the correct permissions
+        all_paths = [item['path'] for item in (config['bots'] + config['battlegrounds'])] + [CONFIG_FILE]
+        print(all_paths)
+        for path in all_paths:
+            print(path)
+            os.chmod(path, 0o755)  
+
+
         print("All Complete.\nGo to {} to see the server".format(server_url))
         break
     elif return_data['cause'] == 'username':
@@ -52,4 +60,3 @@ while True:
         continue
     else:
         print("Error occured during client registration: {}".format(return_data))
-        break
