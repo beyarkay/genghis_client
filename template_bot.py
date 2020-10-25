@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """
 Date: 2020-10-24
 Author: Boyd Kane: https://github.com/beyarkay
@@ -5,6 +6,7 @@ This is the bare-bones, default bot for the genghis battle system. (https://gith
 """
 
 import json
+import pickle
 import os
 import sys
 import random
@@ -29,12 +31,12 @@ MOTION_SCARED = "SCARED"
 # MOTION_NULL A non-motion, this motion type will always get passed onto the next in the priorities list.
 MOTION_NULL = "NULL"
 motion_priorities = [MOTION_GREEDY, MOTION_CURIOUS, MOTION_ASTRAY]
-move_dict = {
-    "action": "",
-    "direction": ""
-}
 
 def main():
+    move_dict = {
+        "action": "",
+        "direction": ""
+    }
     # Go through each motion type. If that motion type can't be completed, move on to the next motion type.
     # Read in the Game object from game.pickle
     with open("game.pickle", "rb") as gamefile:
@@ -45,7 +47,6 @@ def main():
         if game_bot.bot_icon == sys.argv[2]:
             this_bot = game_bot
             break
-    bot_x, bot_y = bg.find_icon(this_bot.bot_icon)[0]
 
     # Figure out which battleground in the Game the bot is on
     this_battleground = None
@@ -53,9 +54,11 @@ def main():
         if bg.port_icon == sys.argv[3]:
             this_battleground = bg
             break
+    bot_x, bot_y = this_battleground.find_icon(this_bot.bot_icon)[0]
 
     # Go through the different motions, attempting each one in order:
     for motion in motion_priorities:
+        print("Making motion {}, bot is at ({}, {})".format(motion, bot_x, bot_y))
         if motion == MOTION_ASTRAY:
             # Just make a random move
             move_dict = {
@@ -67,17 +70,19 @@ def main():
             print("Bot motion {} not implemented yet".format(motion))
             break
         elif motion == MOTION_CURIOUS:
-            if bg.port_locations:
+            # TODO bg.port_spawn_locations should be renamed bg.port_spawn_locations
+            if this_battleground.port_locations:
                 # 1. Find the nearest port
                 closest_dist = 999999999
                 closest_loc = [None, None]
-                for loc in bg.port_locations:
+                for loc in this_battleground.port_locations:
                     if get_dist([bot_x, bot_y], loc) < closest_dist:
-                        closest_loc = log[:]
+                        closest_loc = loc[:]
                         closest_dist = get_dist([bot_x, bot_y], loc)
+                print("closest port is at {}, {}".format(closest_loc[0], closest_loc[1]))
                 # 2. Path towards it
                 move_dict['action'] = 'walk'
-                move_dict['action'] = get_direction([bot_x, bot_y], closest_loc)
+                move_dict['direction'] = get_direction([bot_x, bot_y], closest_loc)
                 break
         elif motion == MOTION_CLUMSY:
             # 1. Find a battleground with another bot.
@@ -87,7 +92,7 @@ def main():
         elif motion == MOTION_GREEDY:
             # 1. Always move towards the nearest coin.
             # 2. If there are no coins, move on to the next priority motion
-            coin_locations = [bg.find_icon(coin_icon) for coin_icon in game.coin_icons]
+            coin_locations = [this_battleground.find_icon(coin_icon) for coin_icon in game.coin_icons]
             # Flatten the list from 2d to 1d:
             coin_locations = [coin for sublist in coin_locations for coin in sublist]
             if coin_locations:
@@ -96,16 +101,16 @@ def main():
                 closest_loc = [None, None]
                 for loc in coin_locations:
                     if get_dist([bot_x, bot_y], loc) < closest_dist:
-                        closest_loc = log[:]
+                        closest_loc = loc[:]
                         closest_dist = get_dist([bot_x, bot_y], loc)
                 # 2. Path towards it
                 move_dict['action'] = 'walk'
-                move_dict['action'] = get_direction([bot_x, bot_y], closest_loc)
+                move_dict['direction'] = get_direction([bot_x, bot_y], closest_loc)
                 break
         elif motion == MOTION_LAZY:
             # 1. Do nothing
             move_dict['action'] = ''
-            move_dict['action'] = ''
+            move_dict['direction'] = ''
             break
         elif motion == MOTION_SCARED:
             print("{} not implemented yet".format(motion))
