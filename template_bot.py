@@ -28,7 +28,7 @@ MOTION_LAZY = "LAZY"
 MOTION_SCARED = "SCARED"
 # MOTION_NULL A non-motion, this motion type will always get passed onto the next in the priorities list.
 MOTION_NULL = "NULL"
-motion_priorities = [MOTION_GREEDY, MOTION_CURIOUS, MOTION_LAZY]
+motion_priorities = [MOTION_GREEDY, MOTION_CURIOUS, MOTION_ASTRAY]
 move_dict = {
     "action": "",
     "direction": ""
