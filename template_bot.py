@@ -1,149 +1,135 @@
 """
 Date: 2020-10-24
 Author: Boyd Kane: https://github.com/beyarkay
-
-This is the bare-bones, default bot for the genghis battle system. (https://github.com/beyarkay/genghis)
-
-This bot will try to get every coin on the map, and then it'll go to a port to move onto the next map
-
-If BLOODTHIRSTY is set to True, then the bot will fight as much as possible
+This is the bare-bones, default bot for the genghis battle system. (https://github.com/beyarkay/genghis_client)
 """
 
 import json
 import os
 import sys
 import random
-# Bloodthirsty means that a bot will fight as soon as possible
-BLOODTHIRSTY = False
-BROWNANIAN = True
+# add the server directory to the PATH so we can import the utilities file
+sys.path.append(sys.argv[1])
+import util
+
+# MOTION_ASTRAY Move randomly in one of the 8 directions. Doesn't check for obstructions
+MOTION_ASTRAY = "ASTRAY"
+# MOTION_BLOODTHIRSTY Move towards the nearest bot and fight. Passes to the next priority if there are no bot on the current battleground
+MOTION_BLOODTHIRSTY = "BLOODTHIRSTY"
+# MOTION_CURIOUS Always move towards the nearest port and go through it
+MOTION_CURIOUS = "CURIOUS"
+# MOTION_CLUMSY First finds a battleground with another bot, then cycles between picking up and dropping coins
+MOTION_CLUMSY = "CLUMSY"
+# MOTION_GREEDY Always move towards the nearest coin. Passes to the next priority if there are no coins on the current battleground
+MOTION_GREEDY = "GREEDY"
+# MOTION_LAZY Do nothing.
+MOTION_LAZY = "LAZY"
+# MOTION_SCARED If there's another bot on the battleground, run towards the nearest port.
+MOTION_SCARED = "SCARED"
+# MOTION_NULL A non-motion, this motion type will always get passed onto the next in the priorities list.
+MOTION_NULL = "NULL"
+motion_priorities = [MOTION_GREEDY, MOTION_CURIOUS, MOTION_LAZY]
+move_dict = {
+    "action": "",
+    "direction": ""
+}
 
 def main():
-    print("argv: ", sys.argv)
-    if BROWNANIAN:
-        # Just make a random move and then exit
-        with open("move.json", "w+") as movefile:
-            json.dump({
-                "action": "walk",
-                "direction": random.choice(["l", "lu", "u", "ru", "r", "rd", "d", "ld"])
-            }, movefile)
+    # Go through each motion type. If that motion type can't be completed, move on to the next motion type.
+    # Read in the Game object from game.pickle
+    with open("game.pickle", "rb") as gamefile:
+        game = pickle.load(gamefile)
+    # Figure out which bot in the Game object represents this script
+    this_bot = None
+    for game_bot in game.bots:
+        if game_bot.bot_icon == sys.argv[2]:
+            this_bot = game_bot
+            break
+    bot_x, bot_y = bg.find_icon(this_bot.bot_icon)[0]
 
-#    with open(os.path.join(bot_dir, "state.json"), "r") as statefile:
-#        state = json.load(statefile)
-#
-#    bot_data = state['bots'][sn]
-#    
-#    # Now calculate the bot's move
-#    move = {
-#        "action": 'walk',
-#        "direction": '',
-#    }
-#    # Initialise variables. These are all populated with (x, y) coords, and can be used in developing a smarter bot
-#    walls = []
-#    ports = []
-#    bot_loc = [None, None]
-#    enemies = []
-#    enemy_icons = [b['icon'] for b in state['bots'].values()]
-#    coin_icons = [c for c in state['coin_map'].values()]
-#    coins = {}
-#    enemy_icons.remove(bot_data['icon'])
-#
-#    # Iterate through every item in the state['map']
-#    for r, row in enumerate(state['map']):
-#        for c, item in enumerate(row):
-#            if item == bot_data['icon']:
-#                bot_loc = [r, c]
-#
-#            elif item == "#":
-#                walls.append((r, c))
-#            
-#            elif item in list("0123456789"):
-#                ports.append((r, c))
-#            
-#            elif item in coin_icons:
-#                if item in coins:
-#                    coins[item].append((r, c))
-#                else:
-#                    coins[item] = [(r, c)]
-#
-#            elif item in enemy_icons:
-#                enemies.append((r, c))
-#    
-#    # Logic for attacking other bots (if they exist)
-#    weapon_keys = [k for k, v in bot_data['coins'].items() if v > 0]
-#    if weapon_keys and BLOODTHIRSTY: #if we have a coin to fight with
-#        enemy_dists = [get_dist(e, bot_loc) for e in enemies]
-#
-#        # If there's a bot adjacent to us
-#        if any([dist == 1 for dist in enemy_dists]):
-#            move['action'] = 'attack'
-#            move['weapon'] = weapon_keys[0]
-#            enemy = get_closest(enemies, bot_loc)
-#            move['direction'] = get_dir(bot_loc, enemy)
-#        
-#        # Walk towards the nearest enemy if one exists, otherwise go to a port
-#        else:
-#            if enemies:
-#                closest = get_closest(enemies, bot_loc)
-#                print('moving towards enemy at {}'.format(closest))
-#            else:
-#                closest = get_closest(ports, bot_loc)
-#                print('moving towards port at {}'.format(closest))
-#            
-#            move['direction'] = get_dir(bot_loc, closest)
-#            move['action'] = 'walk'
-#
-#    # Go coin collecting if coins exist, otherwise go to a port
-#    else:
-#        if coins.keys(): # If there are coins to be had, go get them 
-#            closest = get_closest(list(coins.values())[0], bot_loc)
-#            print('moving towards coin at {}'.format(closest))
-#        else: # Otherwise, go to a port and move on to the next node 
-#            closest = get_closest(ports, bot_loc)
-#            print('moving towards port at {}'.format(closest))
-#
-#        move['direction'] = get_dir(bot_loc, closest)
-#        move['action'] = 'walk'
-#
-#    with open(os.path.join(bot_dir, "move.json"), "w+") as move_file:
-#        json.dump(move, move_file)
-#
-#
-#def get_dist(from_A, to_B):
-#    delta_x = abs(to_B[0] - from_A[0])
-#    delta_y = abs(to_B[1] - from_A[1])
-#    return max(delta_x, delta_y)
-#    
-#
-#def get_dir(from_A, to_B):
-#    delta_x = min(1, max(-1, to_B[0] - from_A[0]))
-#    delta_y = min(1, max(-1, to_B[1] - from_A[1]))
-#    move_array = [
-#        ['lu', 'u', 'ru'], 
-#        ['l', '', 'r'], 
-#        ['ld', 'd', 'rd']
-#    ]
-#    return move_array[delta_y + 1][delta_x + 1]
-#
-#
-#def get_closest(locations, bot_location):
-#    """Given a list of (x, y) locations, and an initial bot_location, find the item of locations that's
-#    closest (allowing diagonal travel) to the given bot_location
-#
-#    """
-#
-#    if not bot_location or not bot_location[0] or not bot_location[1]:
-#        raise Exception("bot_locations is empty: {}".format(bot_location))
-#    if not locations:
-#        raise Exception("locations is empty: {}".format(locations))
-#
-#    closest = locations[0]
-#    closest_dist = get_dist(closest, bot_location)
-#    for l in locations:
-#        dist = get_dist(l, bot_location)
-#        if dist < closest_dist:
-#            closest = l
-#            closest_dist = dist
-#    return closest
+    # Figure out which battleground in the Game the bot is on
+    this_battleground = None
+    for bg in game.battlegrounds:
+        if bg.port_icon == sys.argv[3]:
+            this_battleground = bg
+            break
+
+    # Go through the different motions, attempting each one in order:
+    for motion in motion_priorities:
+        if motion == MOTION_ASTRAY:
+            # Just make a random move
+            move_dict = {
+                    "action": "walk",
+                    "direction": random.choice(["l", "lu", "u", "ru", "r", "rd", "d", "ld"])
+                }
+            break
+        elif motion == MOTION_BLOODTHIRSTY:
+            print("Bot motion {} not implemented yet".format(motion))
+            break
+        elif motion == MOTION_CURIOUS:
+            if bg.port_locations:
+                # 1. Find the nearest port
+                closest_dist = 999999999
+                closest_loc = [None, None]
+                for loc in bg.port_locations:
+                    if get_dist([bot_x, bot_y], loc) < closest_dist:
+                        closest_loc = log[:]
+                        closest_dist = get_dist([bot_x, bot_y], loc)
+                # 2. Path towards it
+                move_dict['action'] = 'walk'
+                move_dict['action'] = get_direction([bot_x, bot_y], closest_loc)
+                break
+        elif motion == MOTION_CLUMSY:
+            # 1. Find a battleground with another bot.
+            # 2. Cycle between picking up and dropping coins
+            print("{} not implemented yet".format(motion))
+            break
+        elif motion == MOTION_GREEDY:
+            # 1. Always move towards the nearest coin.
+            # 2. If there are no coins, move on to the next priority motion
+            coin_locations = [bg.find_icon(coin_icon) for coin_icon in game.coin_icons]
+            # Flatten the list from 2d to 1d:
+            coin_locations = [coin for sublist in coin_locations for coin in sublist]
+            if coin_locations:
+                # # 1. Find the nearest coin
+                closest_dist = 999999999
+                closest_loc = [None, None]
+                for loc in coin_locations:
+                    if get_dist([bot_x, bot_y], loc) < closest_dist:
+                        closest_loc = log[:]
+                        closest_dist = get_dist([bot_x, bot_y], loc)
+                # 2. Path towards it
+                move_dict['action'] = 'walk'
+                move_dict['action'] = get_direction([bot_x, bot_y], closest_loc)
+                break
+        elif motion == MOTION_LAZY:
+            # 1. Do nothing
+            move_dict['action'] = ''
+            move_dict['action'] = ''
+            break
+        elif motion == MOTION_SCARED:
+            print("{} not implemented yet".format(motion))
+            break
+        elif motion == MOTION_NULL:
+            pass
+
+    with open("move.json", "w+") as movefile:
+        json.dump(move_dict, movefile)
+
+def get_dist(here, there):
+   delta_x = abs(there[0] - here[0])
+   delta_y = abs(there[1] - here[1])
+   return max(delta_x, delta_y)
+
+def get_direction(here, there):
+   delta_x = min(1, max(-1, there[0] - here[0]))
+   delta_y = min(1, max(-1, there[1] - here[1]))
+   move_array = [
+       ['lu', 'u', 'ru'],
+       ['l', '', 'r'],
+       ['ld', 'd', 'rd']
+   ]
+   return move_array[delta_y + 1][delta_x + 1]
 
 
 if __name__ == '__main__':
