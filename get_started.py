@@ -33,6 +33,12 @@ while True:
         # Update the config.json file
         with open(CONFIG_FILE, 'r') as config_file:
             config = json.load(config_file)
+        for bg in config.get('battlegrounds'):
+            bg_path = bg.get('path')
+            if os.path.exists(bg_path):
+                os.chmod(bg_path, 0o755)
+            else:
+                print("Battleground path {} does not exist".format(bg_path))
         for bot in config.get('bots'):
             bot_path = bot.get('path')
             if os.path.exists(bot_path):
