@@ -6,8 +6,6 @@ import json
 DEBUG = False
 CONFIG_FILE = 'config.json'
 
-# Update the directory permissions
-
 if len(sys.argv) > 1:
     server_url = sys.argv[1]
     client_url = sys.argv[2]
@@ -35,6 +33,12 @@ while True:
         # Update the config.json file
         with open(CONFIG_FILE, 'r') as config_file:
             config = json.load(config_file)
+        for bot in config.get('bots'):
+            bot_path = bot.get('path')
+            if os.path.exists(bot_path):
+                os.chmod(bot_path, 0o755)
+            else:
+                print("Bot path {} does not exist".format(bot_path))
         config['username'] = username
         config['abbreviations'] = abbreviations
         config['url'] = client_url
@@ -52,7 +56,7 @@ while True:
             os.chmod(path, 0o755)  
 
 
-        print("All Complete.\nGo to {} to see the server".format(server_url))
+        print("All Complete")
         break
     elif return_data['cause'] == 'username':
         print("That username has already been taken, please choose another.")
