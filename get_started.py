@@ -3,7 +3,7 @@ import requests
 import sys
 import json
 
-DEBUG = True
+DEBUG = False
 CONFIG_FILE = 'config.json'
 
 # Update the directory permissions
@@ -46,9 +46,9 @@ while True:
 
         # Now make sure all the bot/battleground files have the correct permissions
         all_paths = [item['path'] for item in (config['bots'] + config['battlegrounds'])] + [CONFIG_FILE]
-        print(all_paths)
+        if DEBUG: print(all_paths)
         for path in all_paths:
-            print(path)
+            if DEBUG: print(path)
             os.chmod(path, 0o755)  
 
 

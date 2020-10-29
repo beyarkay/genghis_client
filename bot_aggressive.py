@@ -31,7 +31,7 @@ MOTION_SCARED = "SCARED"
 # MOTION_NULL A non-motion, this motion type will always get passed onto the next in the priorities list.
 MOTION_NULL = "NULL"
 
-motion_priorities = [MOTION_GREEDY, MOTION_BLOODTHIRSTY, MOTION_CURIOUS, MOTION_ASTRAY]
+motion_priorities = [MOTION_BLOODTHIRSTY, MOTION_CURIOUS, MOTION_ASTRAY]
 
 def main():
     move_dict = {
