@@ -1,16 +1,12 @@
 {
   "bots": [
     {
-      "path": "bot_greedy.py",
-      "name": "greedy"
-    },
-    {
-      "path": "bot_aggressive.py",
-      "name": "agressive"
+      "path": "template_bot.py",
+      "name": "t1"
     },
     {
       "path": "template_bot.py",
-      "name": "template"
+      "name": "t2"
     }
   ],
   "battlegrounds": [
