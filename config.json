@@ -2,20 +2,16 @@
   "bots": [
     {
       "path": "template_bot.py",
-      "name": "t1"
-    },
-    {
-      "path": "template_bot.py",
-      "name": "t2"
+      "name": "template bot"
     }
   ],
   "battlegrounds": [
     {
       "path": "template_battleground.txt",
-      "name": "my battleground"
+      "name": "template battleground"
     }
   ],
-  "username": "abby",
+  "username": "MY USERNAME",
   "abbreviations": [
     "a"
   ],
