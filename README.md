@@ -5,11 +5,11 @@ students compete for resources, trade, and fight each other across
 multiple different battlegrounds.
 
 ## Get started - Make Your Own Bot
-To get started, you will need to copy some code from a GitHub repository into an 
+To get started, you will need to copy some code from this GitHub repository into an 
 internet-connected sever (like UCT's nightmare server that all second-year students 
 have access to).
 
-1. ssh into the UCT server:
+1. `ssh` into the UCT server:
 
     ```ssh <YOUR_STUDENT_NUMBER>@nightmare.cs.uct.ac.za```
 2. Make a public directory to host the bot script, and change into it:
@@ -42,15 +42,14 @@ have a ```genghis_client``` directory, with some files inside:
 * ```get_started.py``` - This script will register you with a genghis server, so that
 you can fight against the other bots on that server (you've already done this)
 * ```config.json``` - Tells the server where to find your bot script (and other things)
-* ```template_bot.py``` - This is your bot! It's not much just yet though...
+* ```template_bot.py``` - This is where you code your bot!
 * ```template_battleground.py``` - You can also customise a battleground, which defines
 the terrain that your bot will fight on.
-* ```and some other, less important files...```
 
-So, to code your bot you need to edit the ```template_bot.py``` file. At a high
-level, the Genghis server will run your bot (and others) once a round, providing
+So, to code your bot you need to edit the ```template_bot.py``` file. The
+Genghis server will run your bot (and others) over and over again, providing
 you with information about the game (like the battlegrounds available, where
-the other bots are, etc). 
+the other bots are, where the coins are, etc). 
 
 The Genghis Server expects your script to take this 
 information, calculate a move, and then write that move to a file called 
@@ -77,14 +76,13 @@ Now create a python dictionary to hold our move:
 ```
 The 'action' item specifies if you're walking, attacking, etc. 
 The 'direction' item specifies in which direction you want to walk, attack, etc.
- 
-For now, just walk in a random direction, either left, right, up or down.
+ For now, just walk in a random direction, either left `'l'`, right
+ `'r'`, up `'u'` or down `'d'`.
 
 Finally, actually write our move to a json file 
 (setting indent=2 gives it nice formatting):
 
 ```python
-    # )
     json.dump(my_move_dictionary, json_file, indent=2)
 ```
 And that's it! The full code is here:
@@ -98,6 +96,71 @@ with open('move.json',  'w+') as json_file:
     }
     json.dump(my_move_dictionary, json_file, indent=2)
 ```
+
+Now save the code to a file called `hello_genghis.py` in the 
+`genghis_client` directory. That's your bot done! Except the server
+doesn't know that the script exists yet. To fix this, we need to 
+edit `config.json`.
+
+We want to add the path to `hello_genghis.py` inside 
+`config.json` so that the server can read `config.json`, and then find
+our script. To do this, open `config.json` and change 
+```
+...
+  "bots": [
+    {
+      "path": "template_bot.py",
+      "name": "template bot"
+    }
+  ],
+...
+```
+to look like
+```
+...
+  "bots": [
+    {
+      "path": "template_bot.py",
+      "name": "template bot"
+    }, {
+      "path": "hello_genghis.py",
+      "name": "my first bot"
+    }
+  ],
+...
+```
+So now the full `config.json` file looks something like this (yours might 
+look slightly different):
+```
+{
+  "bots": [
+    {
+      "path": "template_bot.py",
+      "name": "template bot"
+    }, {
+      "path": "hello_genghis.py",
+      "name": "my first bot"
+    }
+  ],
+  "battlegrounds": [
+    {
+      "path": "template_battleground.txt",
+      "name": "template battleground"
+    }
+  ],
+  "username": "<MY USERNAME>",
+  "abbreviations": [
+    "a"
+  ],
+  "url": "https://people.cs.uct.ac.za/~<MY STUDENT NUMBER>/genghis_client",
+  "server_url": "https://people.cs.uct.ac.za/~KNXBOY001/genghis_server/"
+}
+```
+That's it! go to [https://people.cs.uct.ac.za/~KNXBOY001/genghis_server/](https://people.cs.uct.ac.za/~KNXBOY001/genghis_server/)
+to watch your bot in the next battle.
+
+However, your bot isn't very smart. To get it doing something fancier, 
+we need to learn about our options for what to put in `move.json`:
 
 ## Options for bot actions
 ### `"action": "walk"`
@@ -142,7 +205,31 @@ and `'type'` which defines which coin to drop, and must be one of `a` through `z
 You may only drop coins you have, and you may only drop onto other bots 
  (`A` through to `Z`) or onto empty air blocks `' '`. Anything else 
 will result in a null move (nothing happening).
+ 
+## A slightly improved `hello_genghis.py`
+
+With our newfound knowledge, we can update `hello_genghis.py` to either
+make a random move, or a random attack, or randomly drop a coin:
+
+```python
+import json
+import random
+with open('move.json',  'w+') as json_file:
+    my_move_dictionary = {
+        "action": random.choice(['walk', 'attack', 'drop']),        
+        "direction": random.choice(['l', 'r', 'u', 'd', 'lu', 'ru', 'ld', 'rd'])    
+        # 'type' will be ignored if action != 'drop'
+        "type": random.choice([chr(i) for i in range(ord('a'), ord('z') + 1)])    
+    }
+    json.dump(my_move_dictionary, json_file, indent=2)
+```
+
+This is all well and good, but our bot still isn't *smart*. For this, we need to
+know about our surroundings, like where the other bots / coins / ports are, and
+how to get to them:
 
 ## Figuring out your move
+
+
 
 

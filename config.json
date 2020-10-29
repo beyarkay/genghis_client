@@ -1,25 +1,17 @@
 {
   "bots": [
     {
-      "path": "bot_greedy.py",
-      "name": "greedy"
-    },
-    {
-      "path": "bot_aggressive.py",
-      "name": "agressive"
-    },
-    {
       "path": "template_bot.py",
-      "name": "template"
+      "name": "template bot"
     }
   ],
   "battlegrounds": [
     {
       "path": "template_battleground.txt",
-      "name": "my battleground"
+      "name": "template battleground"
     }
   ],
-  "username": "abby",
+  "username": "MY USERNAME",
   "abbreviations": [
     "a"
   ],
