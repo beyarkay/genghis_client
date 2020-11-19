@@ -18,6 +18,7 @@ else:
     # Choose a username
     username = input("Your username: ")
 
+os.chmod('./', 0o755)
 while True:
     abbreviations = [str(c).lower() for c in username if c.isalpha()][0:1]
     # Register the client with the server.
