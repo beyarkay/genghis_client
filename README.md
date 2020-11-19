@@ -27,7 +27,7 @@ have access to).
 6. your (Client) URL:
 
     ```https://people.cs.uct.ac.za/~<YOUR_STUDENT_NUMBER>/genghis_client```
-7. and what you want your username to be:
+7. and what you want your (one word) username to be:
 
     ```Username: <CHOOSE A USERNAME>```
     
