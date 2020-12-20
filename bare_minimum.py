@@ -11,30 +11,29 @@ import pickle
 import os
 import sys
 import random
-# IMPORTANT: add the server directory to the PATH so we can import the utilities file
-sys.path.append(sys.argv[1])
-import util
 
-def main():
+def main(root_dir, bot_icon, bg_port_icon):
+    sys.path.append(root_dir)
+    import util
     move_dict = {
         "action": "",
         "direction": ""
     }
     # Go through each motion type. If that motion type can't be completed, move on to the next motion type.
     # Read in the Game object from game.pickle
-    with open("game.pickle", "rb") as gamefile:
+    with open(root_dir + "/game.pickle", "rb") as gamefile:
         game = pickle.load(gamefile)
     # Figure out which bot in the Game object represents this script
     this_bot = None
     for game_bot in game.bots:
-        if game_bot.bot_icon == sys.argv[2]:
+        if game_bot.bot_icon == bot_icon:
             this_bot = game_bot
             break
 
     # Figure out which battleground in the Game the bot is on
     this_battleground = None
     for bg in game.battlegrounds:
-        if bg.port_icon == sys.argv[3]:
+        if bg.port_icon == bg_port_icon:
             this_battleground = bg
             break
     bot_x, bot_y = this_battleground.find_icon(this_bot.bot_icon)[0]
@@ -42,10 +41,8 @@ def main():
     # TODO: YOUR BOT LOGIC GOES HERE, AND PUTS YOUR MOVE INTO THE DICTIONARY 'move_dict'
 
     
-    with open("move.json", "w+") as movefile:
+    with open(root_dir + "/move.json", "w+") as movefile:
         json.dump(move_dict, movefile)
-
-
 
 def get_dist(here, there):
    """
@@ -77,6 +74,5 @@ def get_direction(here, there):
    ]
    return move_array[delta_y + 1][delta_x + 1]
 
-
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1], sys.argv[2], sys.argv[3])
